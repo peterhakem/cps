@@ -5,7 +5,7 @@ Tired of boring PvP? Want to spice up your server/world fights? You've come to t
 Say goodbye to weak hits! This lightweight script cranks up the PvP experience by tweaking knockback to feel cleaner, snappier, and way more fun (and higher ofc, lol).
 
 - Custom-tuned knockback for better combat flow
-_**gif of changing knockback intensity**_
+[knockback settings](https://raw.githubusercontent.com/peterhakem/cps/refs/heads/main/images/idk.gif)
 - Simple to install, easy to enjoy
 ![image of the behavior pack in pack screen](https://raw.githubusercontent.com/peterhakem/cps/refs/heads/main/images/toggle.jpg)
 - no experimental toggles!
