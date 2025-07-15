@@ -7,10 +7,10 @@ Say goodbye to weak hits! This lightweight script cranks up the PvP experience b
 - Custom-tuned knockback for better combat flow
 _**gif of changing knockback intensity**_
 - Simple to install, easy to enjoy
-_**gif of activating the addon, maybe**_
+![image of the behavior pack in pack screen](https://raw.githubusercontent.com/peterhakem/cps/refs/heads/main/images/toggle.jpg)
 - no experimental toggles!
-_**image of experiments turned off**_
+![all experimental toggles off](https://raw.githubusercontent.com/peterhakem/cps/refs/heads/main/images/experm.png)
 - Clicks per second display, and the victim's health
-_**gif of cps/health counter**_
+![cps display message](https://raw.githubusercontent.com/peterhakem/cps/refs/heads/main/images/cps.jpg)
 
-> Script made by Amin91819 and uploaded by Leonidaaa & **licensed by the MIT licence**
+> Script made by `Amin91819` and uploaded by Leonidaaa & **licensed by the MIT licence**
