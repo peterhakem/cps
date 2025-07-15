@@ -13,4 +13,4 @@ Say goodbye to weak hits! This lightweight script cranks up the PvP experience b
 - Clicks per second display, and the victim's health
 ![cps display message](https://raw.githubusercontent.com/peterhakem/cps/refs/heads/main/images/cps.jpg)
 
-> Script made by `Amin91819` and uploaded by Leonidaaa & **licensed by the MIT licence**
+> Script made by `slimeedude` and uploaded by `Leonidaaa` & **licensed by the MIT licence**
