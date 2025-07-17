@@ -10,6 +10,23 @@ const defaultOptions = {
   cpsCounterEnabled: true,
 };
 
+const translation = {
+  display: "cps:display",
+  displayOff: "cps:display_off",
+  displayOn: "cps:display_on",
+  displayToggle: "cps:display_toggle",
+  knockbackOff: "cps:knockback_off",
+  knockbackOn: "cps:knockback_on",
+  knockbackToggle: "cps:knockback_toggle",
+  toTheAir: "cps:to_the_air",
+  actions: "cps:actions",
+  heightIncrease: "cps:height_increase",
+  heightDecrease: "cps:height_decrease",
+  heightReset: "cps:height_reset",
+  title: "cps:title",
+  body: "cps:body"
+};
+
 let options = {};
 
 if (world.getDynamicProperty("knockback_options") === undefined) {
@@ -23,55 +40,63 @@ function saveOptions() {
   world.setDynamicProperty("knockback_options", JSON.stringify(options));
 };
 
+/**
+* @param {import('@minecraft/server').RawMessage} msg
+* @param {Player} player 
+*/
 function subtitle(msg, player) {
-  return player.runCommandAsync(`titleraw @s actionbar {"rawtext":[{"text":"${msg}"}]}`);
-};
+  return player.onScreenDisplay.setActionBar(msg);
+}
 
+/**
+* @param {import('@minecraft/server').RawMessage} msg a rawText message like `{ text: "hi" }`
+* @param {Player} player 
+*/
 function message(msg, player) {
-  return player.runCommandAsync(`tellraw @s {"rawtext":[{"text":"${msg}"}]}`);
-};
+  return player.sendMessage(msg);
+}
 
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource }) => {
-  if (damageSource.damagingEntity) {
+  if (damageSource.damagingEntity && damageSource.damagingEntity instanceof Player) {
     let health = hurtEntity.getComponent(EntityHealthComponent.componentId);
     if (options.cpsCounterEnabled) {
-      subtitle(`§l§aCPS§e: §b${getPlayerCPS(damageSource.damagingEntity)}§e, §dTarget Health§e: §c${health.currentValue.toFixed(1)}`, damageSource.damagingEntity);
-    };
+      subtitle({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity), health.currentValue.toFixed(1)] }, damageSource.damagingEntity)
+    }
     if (options.knockbackEnabled) {
       hurtEntity.applyKnockback(0, 0, defaultKb + options.customKb, defaultKb + options.customKb);
-    };
+    }
   }
 });
 
 function toggleCpsCounter(source) {
   if (options.cpsCounterEnabled) {
     options.cpsCounterEnabled = false;
-    message(`§e[§cKB§e]§c CPS/Health counter has been disabled§e.§r`, source);
+    message({ translate: translation.displayOff }, source);
   } else {
     options.cpsCounterEnabled = true;
-    message(`§e[§cKB§e]§a CPS/Health counter has been enabled§e.§r`, source);
+    message({ translate: translation.displayOn }, source);
   }
 };
 
 function toggleKnockback(source) {
   if (options.knockbackEnabled) {
     options.knockbackEnabled = false;
-    message(`§e[§cKB§e]§c Knockback has been disabled§e.§r`, source);
+    message({ translate: translation.displayOff }, source);
   } else {
     options.knockbackEnabled = true;
-    message(`§e[§cKB§e]§a Knockback has been enabled§e.§r`, source);
+    message({ translate: translation.displayOn }, source);
   }
 };
 
 const gui = new ActionFormData();
-gui.title('§l§bKnockback Settings');
-gui.body('§l§fActions:');
-gui.button('§l§aToggle Knockback');
-gui.button('§l§dToggle CPS/Health counter');
-gui.button('§l§eIncrease Height');
-gui.button('§l§eDecrease Height');
-gui.button('§l§eReset Height');
-gui.button('§l§bTo the air!');
+gui.title({ translate: translation.title});
+gui.body({ translate: translation.body });
+gui.button({ translate: translation.knockbackToggle });
+gui.button({ translate: translation.displayToggle });
+gui.button({ translate: translation.heightIncrease });
+gui.button({ translate: translation.heightDecrease});
+gui.button({ translate: translation.heightReset });
+gui.button({ translate: translation.toTheAir });
 
 world.afterEvents.itemUse.subscribe(data => {
   const source = data.source

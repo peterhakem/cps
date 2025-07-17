@@ -22,10 +22,10 @@ world.afterEvents.entityHitEntity.subscribe(function ({ damagingEntity }) {
     clicks.set(damagingEntity, playerClicks);
 });
 /**
- * Get a player's clicks per second
- * @param player
- * @returns
- */
+* @description Get a player's clicks per second
+* @param player
+* @returns
+*/
 export function getPlayerCPS(player) {
     const currentTime = Date.now();
     const playerClicks = clicks.get(player) || [];
