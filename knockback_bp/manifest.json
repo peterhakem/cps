@@ -6,8 +6,8 @@
     "uuid": "ae7ed1b8-7d37-46d2-b3dd-10f62a641e8c",
     "version": [
       1,
-      0,
-      1
+      1,
+      0
     ],
     "min_engine_version": [
       1,
@@ -48,7 +48,7 @@
     }
   ],
   "metadata": {
-    "authors": ["slimeedude", "Leonidaaa"],
+    "authors": ["slimeedude", "LeonidaMan6552"],
     "license": "MIT"
   }
 }
