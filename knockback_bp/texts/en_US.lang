@@ -1,15 +1,2 @@
 ﻿pack.name=§aPlayer Knockback BP§r
 pack.description=§eThis pack allows you to combo players by increasing their knockback height, similar to popular PvP servers. \n§cThis pack is still under development, so it might have bugs! \n§bCreated by: §e@slimeedude§r. \n§bAlso thanks to: §e@Leonidaaa§r.
-cps:display=§l§aCPS§e: §b%1§e, §dTarget Health§e: §c%2
-cps:display_off=§e[§cKB§e]§c CPS/Health counter has been disabled§e.§r
-cps:display_on=§e[§cKB§e]§a CPS/Health counter has been enabled§e.§r
-cps:display_toggle=§l§dToggle CPS/Health counter
-cps:knockback_off=§e[§cKB§e]§c Knockback has been disabled§e.§r
-cps:knockback_on=e[§cKB§e]§a Knockback has been enabled§e.§r
-cps:knockback_toggle=§l§aToggle Knockback
-cps:height_increase=§l§eIncrease Height
-cps:height_decrease=§l§eDecrease Height
-cps:height_reset=§l§eReset Height
-cps:title=§l§bKnockback Settings
-cps:body=§l§fActions:
-cps:to_the_air=§l§bTo the air!

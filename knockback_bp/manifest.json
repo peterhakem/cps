@@ -7,7 +7,7 @@
     "version": [
       1,
       1,
-      0
+      1
     ],
     "min_engine_version": [
       1,
@@ -45,10 +45,22 @@
     {
       "module_name": "@minecraft/server-ui",
       "version": "1.1.0"
+    },
+    {
+      "uuid": "0c01ad52-7476-47de-beda-ff9646b8d25c",
+      "version": [
+        1,
+        1,
+        1
+      ]
     }
   ],
   "metadata": {
-    "authors": ["slimeedude", "Leonidaaa"],
-    "license": "MIT"
+    "authors": [
+      "slimeedude",
+      "Leonidaaa"
+    ],
+    "license": "MIT",
+    "product_type": "addon"
   }
 }

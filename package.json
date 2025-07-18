@@ -1,0 +1,27 @@
+{
+  "name": "cps",
+  "version": "1.1.1",
+  "description": "Tired of boring PvP? Want to spice up your server/world fights? You've come to the right place!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peterhakem/cps.git"
+  },
+  "keywords": [
+    "addon"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/peterhakem/cps/issues"
+  },
+  "homepage": "https://github.com/peterhakem/cps#readme",
+  "dependencies": {
+    "@minecraft/server": "^1.11.0",
+    "@minecraft/server-ui": "^1.1.0"
+  }
+}

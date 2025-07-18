@@ -1,0 +1,47 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "pack.name",
+    "description": "pack.description",
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ],
+    "uuid": "0c01ad52-7476-47de-beda-ff9646b8d25c",
+    "version": [
+      1,
+      1,
+      1
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "d71d255f-acf9-48e6-8b88-be2dbf8b09f7",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "ae7ed1b8-7d37-46d2-b3dd-10f62a641e8c",
+      "version": [
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "Amin",
+      "Leonidaaa"
+    ],
+    "product_type": "addon",
+    "license": "MIT"
+  }
+}

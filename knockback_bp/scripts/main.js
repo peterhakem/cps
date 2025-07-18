@@ -1,3 +1,20 @@
+/**
+ * @file Player knockback++ main script for Minecraft Bedrock
+ * 
+ * Provides a GUI for players to toggle CPS counter and knockback settings
+ * with persistent options using dynamic properties
+ * 
+ * Includes translations for UI, and applies knockback or displays entity and damage data
+ * on player damage events. GUI is triggered via a custom item which is knockback settings
+ * from equipments category in the creative mode menu.
+ * 
+ * @author slimeedude (Amin MT)
+ * @author Leonidaaa
+ * @version 1.1.1
+ * @license MIT
+ * @since 2025-07-18
+ */
+ 
 import { world, Player, EntityHealthComponent } from '@minecraft/server';
 import { ActionFormData } from "@minecraft/server-ui";
 import { getPlayerCPS } from "cps";
@@ -29,7 +46,7 @@ const translation = {
 
 let options = {};
 
-if (world.getDynamicProperty("knockback_options") === undefined) {
+if (!world.getDynamicProperty("knockback_options")) {
   world.setDynamicProperty("knockback_options", JSON.stringify(defaultOptions));
   options = defaultOptions;
 } else {
@@ -44,7 +61,7 @@ function saveOptions() {
 * @param {import('@minecraft/server').RawMessage} msg
 * @param {Player} player 
 */
-function subtitle(msg, player) {
+function subtitle(msg, player) { // maybe we should rename this into Actionbar since its NOT subtitle
   return player.onScreenDisplay.setActionBar(msg);
 }
 
@@ -58,9 +75,10 @@ function message(msg, player) {
 
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource }) => {
   if (damageSource.damagingEntity && damageSource.damagingEntity instanceof Player) {
+    /** @type {EntityHealthComponent}  */
     let health = hurtEntity.getComponent(EntityHealthComponent.componentId);
     if (options.cpsCounterEnabled) {
-      subtitle({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity), health.currentValue.toFixed(1)] }, damageSource.damagingEntity)
+      subtitle({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity).toString(), health.currentValue.toString()] }, damageSource.damagingEntity)
     }
     if (options.knockbackEnabled) {
       hurtEntity.applyKnockback(0, 0, defaultKb + options.customKb, defaultKb + options.customKb);
@@ -81,10 +99,10 @@ function toggleCpsCounter(source) {
 function toggleKnockback(source) {
   if (options.knockbackEnabled) {
     options.knockbackEnabled = false;
-    message({ translate: translation.displayOff }, source);
+    message({ translate: translation.knockbackOff }, source);
   } else {
     options.knockbackEnabled = true;
-    message({ translate: translation.displayOn }, source);
+    message({ translate: translation.knockbackOn }, source);
   }
 };
 
@@ -110,6 +128,3 @@ world.afterEvents.itemUse.subscribe(data => {
     if (result.selection === 5) { source.applyKnockback(0, 0, 5, 5); message(`§e[§cKB§e]§b Whoosh§e!§r`, source); };
   });
 });
-
-// @slimeedude aka Amin MT.
-// @Leonidaaa

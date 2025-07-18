@@ -23,8 +23,8 @@ world.afterEvents.entityHitEntity.subscribe(function ({ damagingEntity }) {
 });
 /**
 * @description Get a player's clicks per second
-* @param player
-* @returns
+* @param {Player} player
+* @returns {number}
 */
 export function getPlayerCPS(player) {
     const currentTime = Date.now();
