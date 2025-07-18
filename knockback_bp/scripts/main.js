@@ -12,7 +12,7 @@
  * @author Leonidaaa
  * @version 1.1.1
  * @license MIT
- * @since 2025-07-18
+ * @since 2025-07-16
  */
  
 import { world, Player, EntityHealthComponent } from '@minecraft/server';
@@ -21,11 +21,28 @@ import { getPlayerCPS } from "cps";
 
 const defaultKb = 0.37;
 
+/**
+ * @typedef {object} DefaultOptions
+ * @property {number} customKb
+ * @property {boolean} knockbackEnabled
+ * @property {boolean} cpsCounterEnabled
+ */
 const defaultOptions = {
   customKb: 0,
   knockbackEnabled: true,
   cpsCounterEnabled: true,
 };
+
+const uiTextures = {
+  displayOff: "textures/ui/displayoff",
+  displayOn: "textures/ui/displayon",
+  knockbackOn: "textures/ui/knockon",
+  knockbackOff: "textures/ui/knockoff",
+  heightIncrease: "textures/ui/heightincr",
+  heightDecrease: "textures/ui/heightdecr",
+  heightReset: "textures/ui/heightreset",
+  air: "textures/ui/air"
+}
 
 const translation = {
   display: "cps:display",
@@ -44,6 +61,7 @@ const translation = {
   body: "cps:body"
 };
 
+/** @type {DefaultOptions | null} */
 let options = {};
 
 if (!world.getDynamicProperty("knockback_options")) {
@@ -78,7 +96,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource }) => {
     /** @type {EntityHealthComponent}  */
     let health = hurtEntity.getComponent(EntityHealthComponent.componentId);
     if (options.cpsCounterEnabled) {
-      subtitle({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity).toString(), health.currentValue.toString()] }, damageSource.damagingEntity)
+      subtitle({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity).toString(), health.currentValue.toFixed(1).toString()] }, damageSource.damagingEntity)
     }
     if (options.knockbackEnabled) {
       hurtEntity.applyKnockback(0, 0, defaultKb + options.customKb, defaultKb + options.customKb);
@@ -106,17 +124,17 @@ function toggleKnockback(source) {
   }
 };
 
-const gui = new ActionFormData();
-gui.title({ translate: translation.title});
-gui.body({ translate: translation.body });
-gui.button({ translate: translation.knockbackToggle });
-gui.button({ translate: translation.displayToggle });
-gui.button({ translate: translation.heightIncrease });
-gui.button({ translate: translation.heightDecrease});
-gui.button({ translate: translation.heightReset });
-gui.button({ translate: translation.toTheAir });
-
 world.afterEvents.itemUse.subscribe(data => {
+  const gui = new ActionFormData();
+  gui.title({ translate: translation.title});
+  gui.body({ translate: translation.body });
+  gui.button({ translate: translation.knockbackToggle }, options?.knockbackEnabled ? uiTextures.knockbackOn : uiTextures.knockbackOff);
+  gui.button({ translate: translation.displayToggle }, options?.cpsCounterEnabled ? uiTextures.displayOn : uiTextures.displayOff);
+  gui.button({ translate: translation.heightIncrease }, uiTextures.heightIncrease);
+  gui.button({ translate: translation.heightDecrease}, uiTextures.heightDecrease);
+  gui.button({ translate: translation.heightReset }, uiTextures.heightReset);
+  gui.button({ translate: translation.toTheAir }, uiTextures.air);
+
   const source = data.source
   if (!(source instanceof Player)) return;
   if (data.itemStack.typeId === 'kb:knockback_settings') gui.show(source).then(result => {
