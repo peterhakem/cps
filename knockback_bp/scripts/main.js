@@ -79,7 +79,7 @@ function saveOptions() {
 * @param {import('@minecraft/server').RawMessage} msg
 * @param {Player} player 
 */
-function subtitle(msg, player) { // maybe we should rename this into Actionbar since its NOT subtitle
+function actionbar(msg, player) {
   return player.onScreenDisplay.setActionBar(msg);
 }
 
@@ -96,7 +96,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource }) => {
     /** @type {EntityHealthComponent}  */
     let health = hurtEntity.getComponent(EntityHealthComponent.componentId);
     if (options.cpsCounterEnabled) {
-      subtitle({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity).toString(), health.currentValue.toFixed(1).toString()] }, damageSource.damagingEntity)
+      actionbar({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity).toString(), health.currentValue.toFixed(1).toString()] }, damageSource.damagingEntity)
     }
     if (options.knockbackEnabled) {
       hurtEntity.applyKnockback(0, 0, defaultKb + options.customKb, defaultKb + options.customKb);
