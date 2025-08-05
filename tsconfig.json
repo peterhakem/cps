@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "target": "ES2021",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./knockback_bp/scripts",
+    "rootDir": "./knockback_bp/scripts",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "./knockback_bp/scripts"
+  ]
+}

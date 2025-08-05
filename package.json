@@ -1,19 +1,18 @@
 {
   "name": "cps",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "description": "Tired of boring PvP? Want to spice up your server/world fights? You've come to the right place!",
-  "main": "index.js",
+  "main": "knockback_bp/scripts/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "create:mcaddon": "zip knockback.mcaddon knockback_bp/* knockback_rp/*"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/peterhakem/cps.git"
   },
   "keywords": [
-    "addon"
+    "Minecraft-Bedrock-Addon"
   ],
-  "author": "",
   "license": "MIT",
   "type": "module",
   "bugs": {

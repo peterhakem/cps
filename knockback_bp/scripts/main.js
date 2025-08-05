@@ -14,7 +14,7 @@
  * @license MIT
  * @since 2025-07-16
  */
- 
+
 import { world, Player, EntityHealthComponent } from '@minecraft/server';
 import { ActionFormData } from "@minecraft/server-ui";
 import { getPlayerCPS } from "cps";
@@ -23,53 +23,89 @@ const defaultKb = 0.37;
 
 /**
  * @typedef {object} DefaultOptions
- * @property {number} customKb
- * @property {boolean} knockbackEnabled
- * @property {boolean} cpsCounterEnabled
+ * @property {number} [customKb]
+ * @property {boolean} [knockbackEnabled]
+ * @property {boolean} [cpsCounterEnabled]
+ * @property {"Players" | "Entities"} [target]
  */
+
+/** @type {DefaultOptions} */
 const defaultOptions = {
   customKb: 0,
   knockbackEnabled: true,
   cpsCounterEnabled: true,
+  target: "Players"
 };
 
-const uiTextures = {
-  displayOff: "textures/ui/displayoff",
-  displayOn: "textures/ui/displayon",
-  knockbackOn: "textures/ui/knockon",
-  knockbackOff: "textures/ui/knockoff",
-  heightIncrease: "textures/ui/heightincr",
-  heightDecrease: "textures/ui/heightdecr",
-  heightReset: "textures/ui/heightreset",
-  air: "textures/ui/air"
+/**
+ * @param {DefaultOptions} options
+ * @returns {boolean}
+ */
+function isOptionsValid(options) {
+  return (
+    typeof options === "object" &&
+    options !== null &&
+    typeof options.customKb === "number" &&
+    typeof options.knockbackEnabled === "boolean" &&
+    typeof options.cpsCounterEnabled === "boolean" &&
+    typeof options.target === "string"
+  );
 }
 
-const translation = {
-  display: "cps:display",
-  displayOff: "cps:display_off",
-  displayOn: "cps:display_on",
-  displayToggle: "cps:display_toggle",
-  knockbackOff: "cps:knockback_off",
-  knockbackOn: "cps:knockback_on",
-  knockbackToggle: "cps:knockback_toggle",
-  toTheAir: "cps:to_the_air",
-  actions: "cps:actions",
-  heightIncrease: "cps:height_increase",
-  heightDecrease: "cps:height_decrease",
-  heightReset: "cps:height_reset",
-  title: "cps:title",
-  body: "cps:body"
+const UiTextures = {
+  DisplayOff: "textures/items/stone_sword",
+  DisplayOn: "textures/ui/displayon",
+  KnockbackOn: "textures/ui/knockon",
+  KnockbackOff: "textures/ui/knockoff",
+  KnockbackTargetPlayer: "textures/ui/icon_steve",
+  KnockbackTargetEntity: "textures/ui/icon_panda",
+  HeightIncrease: "textures/ui/heightincr",
+  HeightDecrease: "textures/ui/heightdecr",
+  HeightReset: "textures/ui/heightreset",
+  ToTheAir: "textures/ui/wind_charged_effect",
+}
+
+const Translation = {
+  Display: "cps:display",
+  DisplayOff: "cps:display_off",
+  DisplayOn: "cps:display_on",
+  DisplayToggle: "cps:display_toggle",
+  KnockbackOff: "cps:knockback_off",
+  KnockbackOn: "cps:knockback_on",
+  KnockbackToggle: "cps:knockback_toggle",
+  ToTheAir: "cps:to_the_air",
+  ToTheAirMessage: "cps:to_the_air_message",
+  Actions: "cps:actions",
+  HeightIncrease: "cps:height_increase",
+  HeightIncreaseMessage: "cps:height_increase_message",
+  HeightDecrease: "cps:height_decrease",
+  HeightDecreaseMessage: "cps:height_decrease_message",
+  HeightMinimal: "cps:height_minimal",
+  HeightReset: "cps:height_reset",
+  HeightResetMessage: "cps:height_reset_message",
+  KnockackTarget: "cps:knockback_target",
+  KnockbackTargetMessage: "cps:knockback_target_message",
+  Title: "cps:title",
+  Body: "cps:body",
 };
 
-/** @type {DefaultOptions | null} */
-let options = {};
+let optionsRaw = world.getDynamicProperty("knockback_options");
+/** @type {DefaultOptions} */
+let options;
 
-if (!world.getDynamicProperty("knockback_options")) {
-  world.setDynamicProperty("knockback_options", JSON.stringify(defaultOptions));
+try {
+  // @ts-ignore
+  const parsed = JSON.parse(optionsRaw ?? "null");
+
+  if (isOptionsValid(parsed)) {
+    options = parsed;
+  } else {
+    throw new Error("invalid options");
+  }
+} catch {
   options = defaultOptions;
-} else {
-  options = JSON.parse(world.getDynamicProperty("knockback_options"));
-};
+  world.setDynamicProperty("knockback_options", JSON.stringify(defaultOptions));
+}
 
 function saveOptions() {
   world.setDynamicProperty("knockback_options", JSON.stringify(options));
@@ -84,7 +120,7 @@ function actionbar(msg, player) {
 }
 
 /**
-* @param {import('@minecraft/server').RawMessage} msg a rawText message like `{ text: "hi" }`
+* @param {import('@minecraft/server').RawMessage | string} msg a rawText message like `{ text: "hi" }`
 * @param {Player} player 
 */
 function message(msg, player) {
@@ -92,57 +128,94 @@ function message(msg, player) {
 }
 
 world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource }) => {
-  if (damageSource.damagingEntity && damageSource.damagingEntity instanceof Player) {
-    /** @type {EntityHealthComponent}  */
-    let health = hurtEntity.getComponent(EntityHealthComponent.componentId);
-    if (options.cpsCounterEnabled) {
-      actionbar({ translate: translation.display, with: [getPlayerCPS(damageSource.damagingEntity).toString(), health.currentValue.toFixed(1).toString()] }, damageSource.damagingEntity)
+  if ((damageSource.damagingEntity ?? null) instanceof Player) {
+    if (options.target === "Players" && hurtEntity instanceof Player) {
+      knockback(hurtEntity, damageSource);
     }
-    if (options.knockbackEnabled) {
-      hurtEntity.applyKnockback(0, 0, defaultKb + options.customKb, defaultKb + options.customKb);
+    if (options.target === "Entities") {
+      knockback(hurtEntity, damageSource);
     }
   }
+
+    function knockback(hurtEntity, damageSource) {
+        let health = hurtEntity.getComponent(EntityHealthComponent.componentId);
+        if (options.cpsCounterEnabled) {
+            // @ts-ignore
+            actionbar({ translate: Translation.Display, with: [getPlayerCPS(damageSource.damagingEntity).toString(), health.currentValue.toFixed(1).toString()] }, damageSource.damagingEntity);
+        }
+        if (options.knockbackEnabled) {
+            hurtEntity.applyKnockback(0, 0, defaultKb + options.customKb, defaultKb + options.customKb);
+        }
+    }
 });
 
+/**
+ * @param {Player} source
+ */
 function toggleCpsCounter(source) {
   if (options.cpsCounterEnabled) {
     options.cpsCounterEnabled = false;
-    message({ translate: translation.displayOff }, source);
+    message({ translate: Translation.DisplayOff }, source);
   } else {
     options.cpsCounterEnabled = true;
-    message({ translate: translation.displayOn }, source);
+    message({ translate: Translation.DisplayOn }, source);
   }
 };
 
+/**
+ * @param {Player} source
+ */
 function toggleKnockback(source) {
   if (options.knockbackEnabled) {
     options.knockbackEnabled = false;
-    message({ translate: translation.knockbackOff }, source);
+    message({ translate: Translation.KnockbackOff }, source);
   } else {
     options.knockbackEnabled = true;
-    message({ translate: translation.knockbackOn }, source);
+    message({ translate: Translation.KnockbackOn }, source);
   }
 };
 
+/**
+ * @param {Player} source
+ */
+function toggleTarget(source) {
+  if (options.target === "Players") {
+    options.target = "Entities";
+    message({ translate: Translation.KnockbackTargetMessage, with: [options.target] }, source);
+  } else {
+    options.target = "Players";
+    message({ translate: Translation.KnockbackTargetMessage, with: [options.target] }, source);
+  }
+}
+
 world.afterEvents.itemUse.subscribe(data => {
-  const gui = new ActionFormData();
-  gui.title({ translate: translation.title});
-  gui.body({ translate: translation.body });
-  gui.button({ translate: translation.knockbackToggle }, options?.knockbackEnabled ? uiTextures.knockbackOn : uiTextures.knockbackOff);
-  gui.button({ translate: translation.displayToggle }, options?.cpsCounterEnabled ? uiTextures.displayOn : uiTextures.displayOff);
-  gui.button({ translate: translation.heightIncrease }, uiTextures.heightIncrease);
-  gui.button({ translate: translation.heightDecrease}, uiTextures.heightDecrease);
-  gui.button({ translate: translation.heightReset }, uiTextures.heightReset);
-  gui.button({ translate: translation.toTheAir }, uiTextures.air);
+  // dynamic textures
+  let knockbackToggleTexture = options?.knockbackEnabled ? UiTextures.KnockbackOn : UiTextures.KnockbackOff;
+  let displayToggleTexture = options?.cpsCounterEnabled ? UiTextures.DisplayOn : UiTextures.DisplayOff;
+  let knockbackTargetTexture = options?.target === "Players" ? UiTextures.KnockbackTargetPlayer : UiTextures.KnockbackTargetEntity;
+
+  const gui = new ActionFormData()
+    .title({ translate: Translation.Title })
+    .body({ translate: Translation.Body })
+    .button({ translate: Translation.KnockbackToggle }, knockbackToggleTexture)
+    .button({ translate: Translation.DisplayToggle }, displayToggleTexture)
+    .button({ translate: Translation.HeightIncrease }, UiTextures.HeightIncrease)
+    .button({ translate: Translation.HeightDecrease }, UiTextures.HeightDecrease)
+    .button({ translate: Translation.HeightReset }, UiTextures.HeightReset)
+    .button({ translate: Translation.KnockackTarget, with: [options.target] }, knockbackTargetTexture)
+    .button({ translate: Translation.ToTheAir }, UiTextures.ToTheAir);
+
 
   const source = data.source
   if (!(source instanceof Player)) return;
   if (data.itemStack.typeId === 'kb:knockback_settings') gui.show(source).then(result => {
+    if (result.canceled || result.selection == null) return;
     if (result.selection === 0) { toggleKnockback(source); saveOptions(); };
     if (result.selection === 1) { toggleCpsCounter(source); saveOptions(); };
-    if (result.selection === 2) { options.customKb += 0.01; message(`§e[§cKB§e]§b Extra knockback height has been increased to ${options.customKb.toFixed(2)}§e.§r`, source); saveOptions(); };
-    if (result.selection === 3) { if (options.customKb > -0.1) { options.customKb += -0.01; message(`§e[§cKB§e]§b Extra knockback height has been decreased to ${options.customKb.toFixed(2)}§e.§r`, source); } else { message(`§e[§cKB§e]§c Knockback height is already at the minimum value§e.§r`, source); }; saveOptions(); };
-    if (result.selection === 4) { options.customKb = 0; message(`§e[§cKB§e]§a Extra knockback height was set to default§e.`, source); saveOptions(); };
-    if (result.selection === 5) { source.applyKnockback(0, 0, 5, 5); message(`§e[§cKB§e]§b Whoosh§e!§r`, source); };
+    if (result.selection === 2) { options.customKb += 0.01; message({ translate: Translation.HeightIncreaseMessage, with: [options.customKb.toFixed(2)] }, source); saveOptions(); };
+    if (result.selection === 3) { if (options.customKb > -0.1) { options.customKb += -0.01; message({ translate: Translation.HeightDecreaseMessage, with: [options.customKb.toFixed(2)] }, source); } else { message({ translate: Translation.HeightMinimal }, source); }; saveOptions(); };
+    if (result.selection === 4) { options.customKb = 0; message({ translate: Translation.HeightResetMessage }, source); saveOptions(); };
+    if (result.selection === 5) { toggleTarget(source); saveOptions() };
+    if (result.selection === 6) { source.applyKnockback(0, 0, 5, 5); message({ translate: Translation.ToTheAirMessage }, source); };
   });
 });
