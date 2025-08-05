@@ -4,7 +4,7 @@
   "description": "Tired of boring PvP? Want to spice up your server/world fights? You've come to the right place!",
   "main": "knockback_bp/scripts/main.js",
   "scripts": {
-    "create:mcaddon": "zip knockback.mcaddon knockback_bp/* knockback_rp/*"
+    "create:mcaddon": "zip -r knockback.mcaddon knockback_bp/ knockback_rp/"
   },
   "repository": {
     "type": "git",
